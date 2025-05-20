@@ -197,4 +197,36 @@ class EconomicModel:
             'payback_period': payback,
             'annual_revenue': annual_revenue,
             'annual_cash_flow': annual_cash_flow
-        } 
+        }
+    
+    def calculate_metrics(self, energy_results: Dict) -> Dict:
+        """Calculate economic metrics based on energy system results."""
+        results = {}
+        for year, data in energy_results.items():
+            # Calculate investment and operational costs for each technology
+            annual_investments = {}
+            annual_opex = {}
+            annual_lcoe = {}
+            for tech, capacity in data['capacity_by_technology'].items():
+                # Skip if capacity is zero or tech not in cost database
+                if capacity == 0 or tech not in self.config.fuel_prices:
+                    continue
+                annual_investments[tech] = self.calculate_capex(
+                    tech, capacity, year
+                )
+                annual_opex[tech] = self.calculate_opex(
+                    tech, capacity, year
+                )
+                annual_lcoe[tech] = self.calculate_lcoe(
+                    tech, capacity, 
+                    data['generation_by_technology'].get(tech, 0),
+                    year
+                )
+            # Store results for the year
+            results[year] = {
+                'investments': annual_investments,
+                'opex': annual_opex,
+                'lcoe': annual_lcoe,
+                # Add more metrics as needed
+            }
+        return results 

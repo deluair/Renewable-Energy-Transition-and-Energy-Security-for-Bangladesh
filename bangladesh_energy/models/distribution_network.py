@@ -87,6 +87,8 @@ class DistributionNetworkModel:
                            load_profile: Dict[str, pd.Series],
                            generation_profile: Dict[str, pd.Series]) -> pd.DataFrame:
         """Calculate power flow in the distribution network."""
+        if not load_profile:
+            return pd.DataFrame() # Return empty DataFrame if no load data
         results = []
         
         # Get all timestamps

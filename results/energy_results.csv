@@ -1,0 +1,163 @@
+Metric,Value,Year
+total_capacity,946.0,2024
+total_generation,178.40302244946832,2024
+total_demand,98601627.47110802,2024
+renewable_share,1.0,2024
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2024
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 178.40302244946832, 'wind': 0}",2024
+total_capacity,0,2025
+total_generation,0,2025
+total_demand,102667746.40034786,2025
+renewable_share,0,2025
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2025
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2025
+total_capacity,0,2026
+total_generation,0,2026
+total_demand,106644616.65679345,2026
+renewable_share,0,2026
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2026
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2026
+total_capacity,0,2027
+total_generation,0,2027
+total_demand,110054089.25553411,2027
+renewable_share,0,2027
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2027
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2027
+total_capacity,0,2028
+total_generation,0,2028
+total_demand,113025054.55260135,2028
+renewable_share,0,2028
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2028
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2028
+total_capacity,0,2029
+total_generation,0,2029
+total_demand,114480452.93923953,2029
+renewable_share,0,2029
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2029
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2029
+total_capacity,0,2030
+total_generation,0,2030
+total_demand,115252896.3013085,2030
+renewable_share,0,2030
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2030
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2030
+total_capacity,0,2031
+total_generation,0,2031
+total_demand,114994429.44241956,2031
+renewable_share,0,2031
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2031
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2031
+total_capacity,0,2032
+total_generation,0,2032
+total_demand,114028704.49977094,2032
+renewable_share,0,2032
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2032
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2032
+total_capacity,0,2033
+total_generation,0,2033
+total_demand,111487897.32087079,2033
+renewable_share,0,2033
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2033
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2033
+total_capacity,0,2034
+total_generation,0,2034
+total_demand,108433481.71143062,2034
+renewable_share,0,2034
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2034
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2034
+total_capacity,0,2035
+total_generation,0,2035
+total_demand,104715347.0582445,2035
+renewable_share,0,2035
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2035
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2035
+total_capacity,0,2036
+total_generation,0,2036
+total_demand,100803839.80251975,2036
+renewable_share,0,2036
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2036
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2036
+total_capacity,0,2037
+total_generation,0,2037
+total_demand,96101470.07682264,2037
+renewable_share,0,2037
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2037
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2037
+total_capacity,0,2038
+total_generation,0,2038
+total_demand,91681432.5853054,2038
+renewable_share,0,2038
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2038
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2038
+total_capacity,0,2039
+total_generation,0,2039
+total_demand,87499689.64054355,2039
+renewable_share,0,2039
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2039
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2039
+total_capacity,0,2040
+total_generation,0,2040
+total_demand,84007008.76913793,2040
+renewable_share,0,2040
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2040
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2040
+total_capacity,0,2041
+total_generation,0,2041
+total_demand,80719498.82494,2041
+renewable_share,0,2041
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2041
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2041
+total_capacity,0,2042
+total_generation,0,2042
+total_demand,78495489.73141222,2042
+renewable_share,0,2042
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2042
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2042
+total_capacity,0,2043
+total_generation,0,2043
+total_demand,77219771.88822153,2043
+renewable_share,0,2043
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2043
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2043
+total_capacity,0,2044
+total_generation,0,2044
+total_demand,77173037.30757043,2044
+renewable_share,0,2044
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2044
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2044
+total_capacity,0,2045
+total_generation,0,2045
+total_demand,77736720.56064096,2045
+renewable_share,0,2045
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2045
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2045
+total_capacity,0,2046
+total_generation,0,2046
+total_demand,79500838.37694465,2046
+renewable_share,0,2046
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2046
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2046
+total_capacity,0,2047
+total_generation,0,2047
+total_demand,82159114.47545509,2047
+renewable_share,0,2047
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2047
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2047
+total_capacity,0,2048
+total_generation,0,2048
+total_demand,85808714.99070467,2048
+renewable_share,0,2048
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2048
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2048
+total_capacity,0,2049
+total_generation,0,2049
+total_demand,89556647.25883651,2049
+renewable_share,0,2049
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2049
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2049
+total_capacity,0,2050
+total_generation,0,2050
+total_demand,93887372.20678723,2050
+renewable_share,0,2050
+capacity_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2050
+generation_by_technology,"{'biomass': 0, 'coal': 0, 'natural': 0, 'solar': 0, 'wind': 0}",2050

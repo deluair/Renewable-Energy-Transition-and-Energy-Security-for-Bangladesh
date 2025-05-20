@@ -52,61 +52,34 @@ class MarketModel:
         self.generators[generator.name] = generator
     
     def clear_market(self, 
-                    demand: pd.Series,
-                    renewable_generation: pd.Series) -> pd.DataFrame:
-        """Clear the electricity market."""
+                     demand_annual_total: float, # Changed from demand_profile Series
+                     renewable_generation_annual_total: float # Changed from renewable_generation Series
+                    ) -> pd.DataFrame:
+        """Clear the electricity market (simplified for annual data)."""
+        # This is a simplified version. For accurate hourly market clearing,
+        # energy_results should provide hourly demand and generation profiles.
         results = []
-        
-        for timestamp in demand.index:
-            # Get demand and renewable generation for current timestamp
-            current_demand = demand[timestamp]
-            current_renewable = renewable_generation[timestamp]
-            
-            # Calculate residual demand
-            residual_demand = current_demand - current_renewable
-            
-            # Get generator bids
-            bids = self._get_generator_bids(timestamp)
-            
-            # Sort bids by price
-            sorted_bids = sorted(bids, key=lambda x: x['price'])
-            
-            # Clear market
-            cleared_volume = 0
-            market_price = self.params.price_floor
-            dispatch = {}
-            
-            for bid in sorted_bids:
-                if cleared_volume >= residual_demand:
-                    break
-                
-                generator = self.generators[bid['generator']]
-                available_capacity = min(
-                    generator.capacity,
-                    bid['quantity']
-                )
-                
-                if cleared_volume + available_capacity <= residual_demand:
-                    dispatch[bid['generator']] = available_capacity
-                    cleared_volume += available_capacity
-                    market_price = bid['price']
-                else:
-                    remaining_demand = residual_demand - cleared_volume
-                    dispatch[bid['generator']] = remaining_demand
-                    cleared_volume = residual_demand
-                    market_price = bid['price']
-            
-            # Record results
-            results.append({
-                'timestamp': timestamp,
-                'demand': current_demand,
-                'renewable_generation': current_renewable,
-                'residual_demand': residual_demand,
-                'market_price': market_price,
-                'cleared_volume': cleared_volume,
-                'dispatch': dispatch
-            })
-        
+        # Simplified market clearing for annual totals
+        # Assume a single clearing for the year
+        # Calculate available conventional generation
+        total_capacity = sum(gen.capacity for gen in self.generators)
+        available_conventional = total_capacity - renewable_generation_annual_total
+        # Calculate supply-demand balance
+        balance = available_conventional - demand_annual_total
+        # Simplified price calculation (e.g., based on scarcity)
+        if balance >= 0:
+            market_price = 50  # Default price if supply meets demand (USD/MWh)
+        else:
+            market_price = self.params.price_cap # Price cap if demand exceeds supply
+        # Placeholder for other metrics
+        results.append({
+            'timestamp': 'Annual', # Representing annual market clearing
+            'demand': demand_annual_total,
+            'renewable_generation': renewable_generation_annual_total,
+            'market_price': market_price,
+            'balance': balance,
+            # Add more detailed metrics if needed for an annual model
+        })
         return pd.DataFrame(results)
     
     def _get_generator_bids(self, timestamp: pd.Timestamp) -> List[Dict]:

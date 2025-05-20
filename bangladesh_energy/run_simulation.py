@@ -8,9 +8,9 @@ import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
-from bangladesh_energy.models.energy_system import EnergySystemModel
+from bangladesh_energy.models.energy_system import EnergySystem, EnergySystemConfig
 from bangladesh_energy.models.economic_model import EconomicModel
-from bangladesh_energy.models.environmental_model import EnvironmentalModel
+from bangladesh_energy.models.environmental_model import EnvironmentalModel, EnvironmentalConfig
 from bangladesh_energy.models.grid_stability import GridStabilityModel, GridParameters
 from bangladesh_energy.models.storage_model import StorageModel, StorageParameters, StorageTechnology
 from bangladesh_energy.models.demand_response import DemandResponseModel, DemandResponseParameters
@@ -18,7 +18,7 @@ from bangladesh_energy.models.transmission_network import TransmissionNetworkMod
 from bangladesh_energy.models.distribution_network import DistributionNetworkModel, DistributionLine, DistributionTransformer, DistributedGenerator
 from bangladesh_energy.models.market_model import MarketModel, MarketParameters, Generator, MarketType
 from bangladesh_energy.models.weather_model import WeatherModel, WeatherParameters, SolarParameters, WindParameters
-from bangladesh_energy.simulation_config import SimulationConfig
+from bangladesh_energy.config.simulation_config import SimulationConfig
 
 class SimulationRunner:
     """Main simulation runner class."""
@@ -28,42 +28,47 @@ class SimulationRunner:
         self.results = {}
         
         # Initialize models
-        self.energy_model = EnergySystemModel(config.energy_params)
-        self.economic_model = EconomicModel(config.economic_params)
-        self.environmental_model = EnvironmentalModel(config.environmental_params)
+        self.energy_model = EnergySystem(EnergySystemConfig(
+            start_year=config.START_YEAR,
+            end_year=config.END_YEAR,
+            technologies=config.TECHNOLOGIES
+        ))
+        self.economic_model = EconomicModel(config.ECONOMIC_PARAMS)
+        self.environmental_model = EnvironmentalModel(EnvironmentalConfig(**config.ENVIRONMENTAL_PARAMS))
         
         # Initialize grid stability model
         self.grid_model = GridStabilityModel(GridParameters(
-            base_load=config.energy_params.base_load,
-            peak_load=config.energy_params.peak_load,
+            base_load=config.DEMAND_PARAMS['base_load'],
+            peak_load=config.DEMAND_PARAMS['peak_load'],
             voltage_levels=[132, 230, 400],  # kV
-            transmission_loss=0.05,  # 5% transmission loss
+            transmission_loss=config.GRID_PARAMS['transmission_loss'],
             spinning_reserve=0.1,  # 10% spinning reserve
-            acceptable_frequency_range=(49.5, 50.5),  # Hz
-            acceptable_voltage_range=(0.95, 1.05)  # p.u.
+            frequency_band=(49.5, 50.5),  # Hz
+            voltage_band=(0.95, 1.05)  # p.u.
         ))
         
         # Initialize storage model
         self.storage_model = StorageModel(StorageParameters(
             technology=StorageTechnology.LITHIUM_ION,
             capacity=1000,  # MWh
-            power_rating=500,  # MW
+            power=500,  # MW
             efficiency=0.9,
             lifetime=15,  # years
-            capital_cost=300,  # USD/kWh
-            operational_cost=5,  # USD/kWh/year
-            degradation_rate=0.02,  # 2% per year
+            capex=300,  # USD/kWh
+            opex=5,  # USD/kWh/year
+            degradation=0.02,  # 2% per year
             response_time=0.1  # seconds
         ))
         
         # Initialize demand response model
         self.dr_model = DemandResponseModel(DemandResponseParameters(
+            program_type=None,  # Set appropriate DemandResponseType if needed
             participation_rate=0.2,  # 20% participation
-            response_delay=0.25,  # hours
+            response_delay=15,  # minutes
             duration=4,  # hours
-            max_load_reduction=0.3,  # 30% max reduction
-            min_load_reduction=0.05,  # 5% min reduction
-            incentive_rate=50,  # USD/MWh
+            max_reduction=3000,  # MW (example value)
+            min_reduction=500,  # MW (example value)
+            incentive_rate=0.05,  # USD/kWh (example value)
             notification_time=24  # hours
         ))
         
@@ -115,10 +120,7 @@ class SimulationRunner:
         ))
         
         # Run energy system simulation
-        energy_results = self.energy_model.simulate(
-            solar_data['capacity_factor'],
-            wind_data['capacity_factor']
-        )
+        energy_results = self.energy_model.simulate()
         
         # Calculate economic metrics
         economic_results = self.economic_model.calculate_metrics(energy_results)
@@ -127,41 +129,72 @@ class SimulationRunner:
         environmental_results = self.environmental_model.calculate_impacts(energy_results)
         
         # Analyze grid stability
-        grid_results = self.grid_model.analyze_stability(
-            energy_results['generation'],
-            energy_results['load']
-        )
+        grid_results_list = []
+        for year, data in energy_results.items():
+            grid_results_list.append(self.grid_model.analyze_stability(
+                pd.DataFrame(data['generation_by_technology'], index=[0]), # Create DataFrame from dict
+                pd.Series(data['total_demand']) # Create Series from scalar
+            ))
+        grid_results = pd.concat(grid_results_list) # Concatenate results from all years
         
         # Analyze storage operation
-        storage_results = self.storage_model.calculate_storage_operation(
-            energy_results['generation'],
-            energy_results['load'],
-            economic_results['electricity_price']
-        )
+        storage_results_list = []
+        for year, data in energy_results.items():
+            # Assuming economic_results is also a dict with year as key
+            # and electricity_price is available per year.
+            # This might need further adjustment based on how economic_results is structured.
+            electricity_price_for_year = economic_results.get(year, {}).get('electricity_price', pd.Series(dtype=float)) 
+            storage_results_list.append(self.storage_model.calculate_storage_operation(
+                pd.Series(data['generation_by_technology']), # Create Series from dict
+                pd.Series(data['total_demand']), # Create Series from scalar
+                electricity_price_for_year
+            ))
+        storage_results = pd.concat(storage_results_list) # Concatenate results
         
         # Analyze demand response
-        dr_results = self.dr_model.simulate_demand_response_event(
-            energy_results['load'],
-            economic_results['electricity_price']
-        )
+        dr_results_list = []
+        for year, data in energy_results.items():
+            # Similar assumptions as above for electricity_price
+            electricity_price_for_year = economic_results.get(year, {}).get('electricity_price', pd.Series(dtype=float))
+            # Define event_start and event_duration for annual simulation
+            event_start_for_year = pd.Timestamp(f"{year}-01-01") # Example: start of the year
+            event_duration_for_year = self.dr_model.params.duration # Use duration from DR params
+            dr_results_list.append(self.dr_model.simulate_demand_response_event(
+                data['total_demand'], # Pass as scalar
+                event_start_for_year, # Add event_start
+                event_duration_for_year, # Add event_duration
+            ))
+        dr_results = pd.concat(dr_results_list) # Concatenate results
         
         # Analyze transmission network
-        transmission_results = self.transmission_model.calculate_power_flow(
-            energy_results['generation'],
-            energy_results['load']
-        )
+        transmission_results_list = []
+        for year, data in energy_results.items():
+            transmission_results_list.append(self.transmission_model.calculate_power_flow(
+                data['generation_by_technology'],
+                data['total_demand']
+            ))
+        transmission_results = pd.concat(transmission_results_list) if transmission_results_list else pd.DataFrame()
         
         # Analyze distribution network
-        distribution_results = self.distribution_model.calculate_power_flow(
-            {node: energy_results['load'] for node in self.distribution_model.network.nodes()},
-            {gen: energy_results['generation'] for gen in self.distribution_model.distributed_generators}
-        )
+        distribution_results_list = []
+        for year, data in energy_results.items():
+             # Ensure network and distributed_generators are initialized correctly for this to work
+            nodes_load = {node: data['total_demand'] for node in getattr(self.distribution_model, 'network', {})} 
+            generators_generation = {gen: data['generation_by_technology'] for gen in getattr(self.distribution_model, 'distributed_generators', {})}
+            distribution_results_list.append(self.distribution_model.calculate_power_flow(
+                nodes_load,
+                generators_generation
+            ))
+        distribution_results = pd.concat(distribution_results_list) if distribution_results_list else pd.DataFrame()
         
         # Analyze market operations
-        market_results = self.market_model.clear_market(
-            energy_results['load'],
-            energy_results['renewable_generation']
-        )
+        market_results_list = []
+        for year, data in energy_results.items():
+            market_results_list.append(self.market_model.clear_market(
+                data['total_demand'], # Pass as scalar
+                pd.Series(data['generation_by_technology']).sum() # Pass total renewable generation as scalar
+            ))
+        market_results = pd.concat(market_results_list) if market_results_list else pd.DataFrame()
         
         # Combine all results
         self.results = {
@@ -186,21 +219,39 @@ class SimulationRunner:
     def save_results(self, output_dir: str = 'results'):
         """Save simulation results to files."""
         os.makedirs(output_dir, exist_ok=True)
-        
-        # Save main results
-        for category, data in self.results.items():
-            if isinstance(data, pd.DataFrame):
-                data.to_csv(f'{output_dir}/{category}_results.csv')
-            elif isinstance(data, dict):
-                pd.DataFrame(data).to_csv(f'{output_dir}/{category}_results.csv')
-        
+        # Save main results for each category (energy, economic, etc.)
+        for category, yearly_data in self.results.items():
+            if category == 'weather': # Weather data is handled separately
+                continue
+            if isinstance(yearly_data, dict):
+                # If yearly_data is a dict of dicts (e.g., {year: {metrics...}} )
+                all_years_df_list = []
+                for year, data_for_year in yearly_data.items():
+                    if isinstance(data_for_year, dict):
+                        # Convert each year's dict to a DataFrame and add a year column
+                        df = pd.DataFrame(list(data_for_year.items()), columns=['Metric', 'Value'])
+                        df['Year'] = year
+                        all_years_df_list.append(df)
+                    elif isinstance(data_for_year, pd.DataFrame):
+                        # If already a DataFrame (e.g. grid_results from concat)
+                        data_for_year['Year'] = year # Add year if not present, though concat might handle it
+                        all_years_df_list.append(data_for_year)
+                if all_years_df_list:
+                    final_df = pd.concat(all_years_df_list)
+                    final_df.to_csv(f'{output_dir}/{category}_results.csv', index=False)
+            elif isinstance(yearly_data, pd.DataFrame):
+                # If the category itself is a DataFrame (e.g. grid_results after concat)
+                yearly_data.to_csv(f'{output_dir}/{category}_results.csv', index=False)
         # Save weather data
-        self.results['weather']['data'].to_csv(f'{output_dir}/weather_data.csv')
-        self.results['weather']['solar'].to_csv(f'{output_dir}/solar_data.csv')
-        self.results['weather']['wind'].to_csv(f'{output_dir}/wind_data.csv')
-        
+        if 'weather' in self.results and isinstance(self.results['weather'], dict):
+            if 'data' in self.results['weather'] and isinstance(self.results['weather']['data'], pd.DataFrame):
+                self.results['weather']['data'].to_csv(f'{output_dir}/weather_data.csv', index=False)
+            if 'solar' in self.results['weather'] and isinstance(self.results['weather']['solar'], pd.DataFrame):
+                self.results['weather']['solar'].to_csv(f'{output_dir}/solar_data.csv', index=False)
+            if 'wind' in self.results['weather'] and isinstance(self.results['weather']['wind'], pd.DataFrame):
+                self.results['weather']['wind'].to_csv(f'{output_dir}/wind_data.csv', index=False)
         # Generate summary report
-        self._generate_summary_report(output_dir)
+        # self._generate_summary_report(output_dir) # Commented out for now
     
     def _generate_summary_report(self, output_dir: str):
         """Generate a summary report of the simulation results."""

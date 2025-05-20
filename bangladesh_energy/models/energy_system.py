@@ -114,17 +114,16 @@ class EnergySystem:
             'Rangpur': 700,
             'Mymensingh': 400
         }
-        
-        # Create daily demand profiles with seasonal and daily variations
+        n_hours = len(self.time_index)
+        # Create daily pattern (24 hours)
+        daily_pattern = np.sin(np.linspace(0, 2*np.pi, 24, endpoint=False)) * 0.3 + 1
+        # Tile daily pattern to match the number of hours in the simulation
+        tiled_daily_pattern = np.tile(daily_pattern, n_hours // 24 + 1)[:n_hours]
+        # Create seasonal pattern (one value per hour in the year)
+        seasonal_pattern = np.sin(np.linspace(0, 2*np.pi, n_hours)) * 0.2 + 1
         for region in self.config.regions:
             base = base_demand[region]
-            # Add daily pattern (higher during day, peak in evening)
-            daily_pattern = np.sin(np.linspace(0, 2*np.pi, 24)) * 0.3 + 1
-            # Add seasonal pattern (higher in summer)
-            seasonal_pattern = np.sin(np.linspace(0, 2*np.pi, 8760)) * 0.2 + 1
-            
-            # Combine patterns
-            demand = base * daily_pattern * seasonal_pattern
+            demand = base * tiled_daily_pattern * seasonal_pattern
             self.demand[region] = demand
     
     def simulate_generation(self, year: int):
@@ -171,14 +170,25 @@ class EnergySystem:
         year_start = pd.Timestamp(f"{year}-01-01")
         year_end = pd.Timestamp(f"{year}-12-31")
         year_mask = (self.time_index >= year_start) & (self.time_index <= year_end)
-        
+        # Group by technology using columns
+        capacity_by_tech = self.capacity.loc[year_end]
+        capacity_by_technology = capacity_by_tech.groupby(lambda x: x.split('_')[0]).sum().to_dict()
+        generation_by_tech = self.generation.loc[year_mask].sum()
+        generation_by_technology = generation_by_tech.groupby(lambda x: x.split('_')[0]).sum().to_dict()
         return {
             'total_capacity': self.capacity.loc[year_mask].sum().sum(),
             'total_generation': self.generation.loc[year_mask].sum().sum(),
             'total_demand': self.demand.loc[year_mask].sum().sum(),
             'renewable_share': self.calculate_renewable_share(year),
-            'capacity_by_technology': self.capacity.loc[year_end].groupby(
-                lambda x: x.split('_')[0]).sum().to_dict(),
-            'generation_by_technology': self.generation.loc[year_mask].groupby(
-                lambda x: x.split('_')[0]).sum().sum().to_dict()
-        } 
+            'capacity_by_technology': capacity_by_technology,
+            'generation_by_technology': generation_by_technology
+        }
+
+    def simulate(self):
+        """Simulate the energy system for all years and return annual summaries."""
+        results = {}
+        for year in range(self.config.start_year, self.config.end_year + 1):
+            self.simulate_generation(year)
+            summary = self.get_system_summary(year)
+            results[year] = summary
+        return results 

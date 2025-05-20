@@ -100,33 +100,31 @@ class DemandResponseModel:
         return max(0.0, min(1.0, sensitivity))
     
     def simulate_demand_response_event(self,
-                                     load_profile: pd.Series,
+                                     load_annual_total: float,
                                      event_start: pd.Timestamp,
                                      event_duration: float) -> pd.DataFrame:
-        """Simulate a demand response event."""
-        # Calculate event end time
+        """Simulate a demand response event (simplified for annual data)."""
         event_end = event_start + pd.Timedelta(hours=event_duration)
-        
-        # Get load profile during event
-        event_load = load_profile[event_start:event_end]
-        
-        # Calculate load reduction
-        reduction = self.calculate_load_reduction(
-            event_load,
-            pd.Series(1.0, index=event_load.index),  # Placeholder price
-            pd.Series(25.0, index=event_load.index)  # Placeholder temperature
-        )
-        
-        # Record event
+        avg_hourly_load_during_event = load_annual_total / 8760
+        load_reduction_during_event = self.params.max_reduction
+        results_df = pd.DataFrame([{
+            'timestamp': event_start,
+            'base_load': avg_hourly_load_during_event,
+            'price': 1.0,
+            'temperature': 25.0,
+            'price_elasticity': 0.1,
+            'temp_sensitivity': 0.1,
+            'load_reduction': load_reduction_during_event,
+            'reduced_load': avg_hourly_load_during_event - load_reduction_during_event
+        }])
         self.active_events.append({
             'start_time': event_start,
             'end_time': event_end,
             'duration': event_duration,
-            'avg_reduction': reduction['load_reduction'].mean(),
-            'total_reduction': reduction['load_reduction'].sum()
+            'avg_reduction': load_reduction_during_event,
+            'total_reduction': load_reduction_during_event * event_duration
         })
-        
-        return reduction
+        return results_df
     
     def calculate_program_metrics(self, 
                                 load_reductions: pd.DataFrame) -> Dict:

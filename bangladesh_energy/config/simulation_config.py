@@ -2,7 +2,7 @@
 Configuration parameters for the Bangladesh Energy Transition simulation.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List
 
 @dataclass
@@ -14,14 +14,14 @@ class SimulationConfig:
     END_YEAR: int = 2050
     
     # Renewable energy targets
-    RENEWABLE_TARGETS: Dict[int, float] = {
+    RENEWABLE_TARGETS: Dict[int, float] = field(default_factory=lambda: {
         2030: 0.15,  # 15% by 2030
         2041: 0.40,  # 40% by 2041
         2050: 1.00   # 100% by 2050
-    }
+    })
     
     # Technology parameters
-    TECHNOLOGIES: Dict[str, Dict] = {
+    TECHNOLOGIES: Dict[str, Dict] = field(default_factory=lambda: {
         'solar_pv': {
             'capacity_factor': 0.18,
             'capex': 800,  # USD/kW
@@ -67,10 +67,10 @@ class SimulationConfig:
             'water_use': 2.0,  # m³/MWh
             'emission_factor': 0.8  # tCO2/MWh
         }
-    }
+    })
     
     # Economic parameters
-    ECONOMIC_PARAMS: Dict = {
+    ECONOMIC_PARAMS: Dict = field(default_factory=lambda: {
         'discount_rate': 0.08,  # 8%
         'inflation_rate': 0.05,  # 5%
         'exchange_rate': 110.0,  # BDT/USD
@@ -81,10 +81,10 @@ class SimulationConfig:
             'oil': 80.0          # USD/bbl
         },
         'opex_escalation': 0.02  # 2% annual escalation
-    }
+    })
     
     # Environmental parameters
-    ENVIRONMENTAL_PARAMS: Dict = {
+    ENVIRONMENTAL_PARAMS: Dict = field(default_factory=lambda: {
         'emission_factors': {
             'natural_gas': 0.4,  # tCO2/MWh
             'coal': 0.8,         # tCO2/MWh
@@ -109,20 +109,20 @@ class SimulationConfig:
             'solar_pv': 2.5,      # m²/kW
             'wind': 0.5           # m²/kW
         }
-    }
+    })
     
     # Grid parameters
-    GRID_PARAMS: Dict = {
+    GRID_PARAMS: Dict = field(default_factory=lambda: {
         'transmission_loss': 0.05,  # 5% transmission loss
         'distribution_loss': 0.08,  # 8% distribution loss
         'grid_capacity_factor': 0.85,
         'grid_capex': 500,  # USD/kW
         'grid_opex': 20,    # USD/kW/year
         'grid_lifetime': 40
-    }
+    })
     
     # Storage parameters
-    STORAGE_PARAMS: Dict = {
+    STORAGE_PARAMS: Dict = field(default_factory=lambda: {
         'battery': {
             'capacity_factor': 0.90,
             'capex': 300,  # USD/kWh
@@ -137,19 +137,19 @@ class SimulationConfig:
             'lifetime': 50,
             'efficiency': 0.80
         }
-    }
+    })
     
     # Demand parameters
-    DEMAND_PARAMS: Dict = {
+    DEMAND_PARAMS: Dict = field(default_factory=lambda: {
         'base_load': 12000,  # MW
         'peak_load': 18000,  # MW
         'annual_growth': 0.06,  # 6% annual growth
         'daily_variation': 0.2,  # 20% daily variation
         'seasonal_variation': 0.15  # 15% seasonal variation
-    }
+    })
     
     # Policy parameters
-    POLICY_PARAMS: Dict = {
+    POLICY_PARAMS: Dict = field(default_factory=lambda: {
         'renewable_incentives': {
             'solar_pv': 0.10,  # 10% subsidy
             'wind': 0.15,      # 15% subsidy
@@ -166,10 +166,10 @@ class SimulationConfig:
             'wind': 0.10,      # USD/kWh
             'biomass': 0.08    # USD/kWh
         }
-    }
+    })
     
     # Social parameters
-    SOCIAL_PARAMS: Dict = {
+    SOCIAL_PARAMS: Dict = field(default_factory=lambda: {
         'employment_factors': {
             'solar_pv': 0.5,    # jobs/MW
             'wind': 0.3,        # jobs/MW
@@ -182,4 +182,4 @@ class SimulationConfig:
             'wind': 0.02,      # 2% of revenue
             'biomass': 0.05    # 5% of revenue
         }
-    } 
+    }) 

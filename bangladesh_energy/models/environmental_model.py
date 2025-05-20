@@ -274,4 +274,25 @@ class EnvironmentalModel:
             for impact, weight in weights.items()
         )
         
-        return score 
+        return score
+
+    def calculate_impacts(self, energy_results: Dict) -> Dict:
+        """Calculate environmental impacts based on energy system results."""
+        results = {}
+        for year, data in energy_results.items():
+            annual_emissions = 0
+            annual_water_use = 0
+            annual_land_use = 0
+            for tech, generation in data['generation_by_technology'].items():
+                annual_emissions += self.calculate_emissions(tech, generation)
+                annual_water_use += self.calculate_water_use(tech, generation)
+            for tech, capacity in data['capacity_by_technology'].items():
+                annual_land_use += self.calculate_land_use(tech, capacity)
+            # Store results for the year
+            results[year] = {
+                'emissions': annual_emissions,
+                'water_use': annual_water_use,
+                'land_use': annual_land_use,
+                # Add more metrics as needed
+            }
+        return results 

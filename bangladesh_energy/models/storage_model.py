@@ -38,50 +38,49 @@ class StorageModel:
         self.cycles = 0
     
     def calculate_storage_operation(self, 
-                                  generation: pd.Series,
-                                  load: pd.Series,
-                                  price: pd.Series) -> pd.DataFrame:
-        """Calculate storage operation over time."""
+                                  generation: Dict[str, float],  # Annual generation by tech
+                                  load: float,  # Annual total load
+                                  price: pd.Series) -> pd.DataFrame: # Assuming price is hourly
+        """Calculate storage operation over time (simplified for annual data)."""
+        # This is a simplified version. For accurate hourly simulation,
+        # energy_results should provide hourly generation and load.
         results = []
-        current_energy = 0.0
-        
-        for timestamp in generation.index:
-            # Calculate net power
-            net_power = generation[timestamp] - load[timestamp]
-            
-            # Determine storage action
-            if net_power > 0:  # Excess generation
-                # Charge if price is low
-                if price[timestamp] < price.mean():
-                    charge_power = min(net_power, 
-                                    self.params.power,
-                                    (self.current_capacity - current_energy) / 
-                                    self.params.efficiency)
-                    current_energy += charge_power * self.params.efficiency
-                    self.cycles += 1
-                else:
-                    charge_power = 0
-            else:  # Generation deficit
-                # Discharge if price is high
-                if price[timestamp] > price.mean():
-                    discharge_power = min(abs(net_power),
-                                       self.params.power,
-                                       current_energy)
-                    current_energy -= discharge_power
-                    self.cycles += 1
-                else:
-                    discharge_power = 0
-            
-            # Record results
-            results.append({
-                'timestamp': timestamp,
-                'net_power': net_power,
-                'charge_power': charge_power if net_power > 0 else 0,
-                'discharge_power': discharge_power if net_power < 0 else 0,
-                'stored_energy': current_energy,
-                'price': price[timestamp]
-            })
-        
+        current_energy = 0.0 # Initial stored energy
+        # Simulate for a representative day (e.g., average day)
+        # or use annual totals for a high-level analysis
+        # For this example, let's assume a simplified annual charge/discharge cycle
+        # based on average net power and price
+        # Ensure load is a scalar if it's a single-value Series
+        scalar_load = load.item() if isinstance(load, pd.Series) and len(load) == 1 else load
+        avg_net_power = generation.sum() - scalar_load # Use .sum() for Pandas Series
+        avg_price = price.mean() if not price.empty else 0 # Handle empty price series
+        # Simplified charge/discharge logic
+        if avg_net_power > 0: # Excess generation
+            if avg_price < price.median() if not price.empty else True: # Charge if price is low or no price data
+                charge_power = min(avg_net_power, 
+                                self.params.power * 8760, # Annual power capacity
+                                (self.current_capacity - current_energy) / self.params.efficiency)
+                current_energy += charge_power * self.params.efficiency
+                self.cycles += 1
+            else:
+                charge_power = 0
+        else: # Generation deficit
+            if avg_price > price.median() if not price.empty else True: # Discharge if price is high or no price data
+                discharge_power = min(abs(avg_net_power),
+                                   self.params.power * 8760, # Annual power capacity
+                                   current_energy)
+                current_energy -= discharge_power
+                self.cycles += 1
+            else:
+                discharge_power = 0
+        results.append({
+            'timestamp': 'Annual', # Representing annual operation
+            'net_power': avg_net_power,
+            'charge_power': charge_power if avg_net_power > 0 else 0,
+            'discharge_power': discharge_power if avg_net_power < 0 else 0,
+            'stored_energy': current_energy,
+            'price': avg_price
+        })
         return pd.DataFrame(results)
     
     def calculate_economics(self, operation_results: pd.DataFrame) -> Dict:
